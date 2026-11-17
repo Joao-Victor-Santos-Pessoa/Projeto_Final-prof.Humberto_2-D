@@ -1,0 +1,3 @@
+CREATE DATABASE pokedex;
+USE pokedex;
+CREATE TABLE pokemons (id INT AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(50) NOT NULL, numero_pokedex INT UNIQUE NOT NULL, tipos1 VARCHAR(20) NOT NULL, tipo2 VARCHAR(20), hp INT, defesa INT, ataque_esp INT, defesa_esp INT, velocidade INT, altura FLOAT, peso FLOAT, img MEDIUMBLOB);
