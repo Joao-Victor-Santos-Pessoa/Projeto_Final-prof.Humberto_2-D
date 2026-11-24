@@ -15,7 +15,7 @@ class Gerenciadorbd:
     def fechar(self):
         self.con.close()
     def inserir_pokemon(self,pokemon:Pokemon):
-        if self.consultar_pokemon==None:
+        if self.consultar_pokemon(pokemon.nome)==None:
             comando="INSERT INTO pokemon(nome,numero_pokedex,tipo1,tipo2,hp,defesa,ataque,altura,peso,img) VALUES(?,?,?,?,?,?,?,?,?,?)"
             valores=(pokemon.nome,pokemon.numpokedex,pokemon.tipo1,pokemon.tipo2,pokemon.hp,pokemon.defesa,pokemon.ataque,pokemon.altura,pokemon.peso,pokemon.imagem)
             self.cur.execute(comando,valores)
