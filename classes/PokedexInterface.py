@@ -3,8 +3,8 @@ from tkinter import messagebox
 from io import BytesIO
 import requests
 from PIL import Image, ImageTk
-from Pokemon import Pokemon
-
+from classes.Pokemon import Pokemon
+from classes.Gerenciadorbd import Gerenciadorbd
 # Dicionário com as cores das tipagem
 tipagensCores = {
     "fire": "#ff5a24",
@@ -29,9 +29,11 @@ tipagensCores = {
 
 
 class PokedexInterface(tk.Tk):
-    def __init__(self, retornoMain=None):
+    def __init__(self, retornoMain=None,banco:Gerenciadorbd=None):
+        
         super().__init__()
-
+        self.banco=banco
+        banco.conectar()
         # Função/callback do main que recebe os retornos disparados pelos botões
         self.retornoMain = retornoMain
         self.pkmAtual = None
@@ -348,6 +350,12 @@ class PokedexInterface(tk.Tk):
             return self.emitirRetorno(None)
 
         self.gerenBTNdelet("banco")
+        resultadoConsulta=self.banco.consultar_pokemon(termo)
+        self.pkmatual= resultadoConsulta
+        self.nomeOriginalBD=self.pkmatual.nome
+        self.imgTKAtual=self.pkmatual.imagem
+        self.exibirPokemonNoCard(resultadoConsulta)
+        self.preencherFormComPokemon(Pokemon)
         return self.emitirRetorno({"acao": "consultar", "termo": termo})
 
     def cadastrarAcao(self):
@@ -372,6 +380,7 @@ class PokedexInterface(tk.Tk):
         self.nomeOriginalBD = pkm.nome
         self.exibirPokemonNoCard(pkm)
         self.gerenBTNdelet("banco")
+        self.banco.inserir_pokemon(pkm)
         return self.emitirRetorno({"acao": "cadastrar", "pokemon": pkm})
 
     def alterarAcao(self):
@@ -384,6 +393,7 @@ class PokedexInterface(tk.Tk):
         chaveAlvo = self.nomeOriginalBD or (self.pkmAtual.nome if self.pkmAtual else pkmAlterado.nome)
         self.nomeOriginalBD = pkmAlterado.nome
         self.exibirPokemonNoCard(pkmAlterado)
+        self.banco.alterar_pokemon(chaveAlvo,pkmAlterado)
         return self.emitirRetorno({
             "acao": "alterar",
             "nome_original": chaveAlvo,
@@ -400,6 +410,7 @@ class PokedexInterface(tk.Tk):
         self.pkmAtual = None
         self.nomeOriginalBD = None
         self.gerenBTNdelet("api")
+        self.banco.deletar_pokemon(alvo)
         return self.emitirRetorno({"acao": "excluir", "nome": alvo})
 
     def criadorTipagens(self, listatTiposEN):
@@ -442,12 +453,3 @@ class PokedexInterface(tk.Tk):
 
         parent.grid_columnconfigure(0, weight=1)
         return {"canvas": canvasBar, "label": valorLabelStat, "cor": barCor}
-
-
-if __name__ == "__main__":
-    def receberRetorno(dadosRetorno):
-        if dadosRetorno:
-            print("Retorno para o main:", dadosRetorno["acao"], dadosRetorno)
-
-    app = PokedexInterface(retornoMain=receberRetorno)
-    app.mainloop()
