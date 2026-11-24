@@ -15,16 +15,20 @@ class Gerenciadorbd:
     def fechar(self):
         self.con.close()
     def inserir_pokemon(self,pokemon:Pokemon):
-        comando="INSERT INTO pokemon(nome,numero_pokedex,tipo1,tipo2,hp,defesa,ataque,altura,peso,img) VALUES(?,?,?,?,?,?,?,?,?,?)"
-        valores=(pokemon.nome,pokemon.numpokedex,pokemon.tipo1,pokemon.tipo2,pokemon.hp,pokemon.defesa,pokemon.ataque,pokemon.altura,pokemon.peso,pokemon.imagem)
-        self.cur.execute(comando,valores)
-        self.con.commit()
+        if self.consultar_pokemon==None:
+            comando="INSERT INTO pokemon(nome,numero_pokedex,tipo1,tipo2,hp,defesa,ataque,altura,peso,img) VALUES(?,?,?,?,?,?,?,?,?,?)"
+            valores=(pokemon.nome,pokemon.numpokedex,pokemon.tipo1,pokemon.tipo2,pokemon.hp,pokemon.defesa,pokemon.ataque,pokemon.altura,pokemon.peso,pokemon.imagem)
+            self.cur.execute(comando,valores)
+            self.con.commit()
     def consultar_pokemon(self,nome:str)->Pokemon:
         resp=self.cur.execute('SELECT * FROM pokemon WHERE nome=?',(nome,))
         dados=resp.fetchone()
-        pokemon=Pokemon(dados[1],dados[2],dados[3],dados[4],dados[5],dados[6],dados[7],dados[8],dados[9])
-        pokemon.adicionar_imagem(dados[10])
-        return pokemon
+        if dados!=None:
+            pokemon=Pokemon(dados[1],dados[2],dados[3],dados[4],dados[5],dados[6],dados[7],dados[8],dados[9])
+            pokemon.adicionar_imagem(dados[10])
+            return pokemon
+        else:
+            return None
     def alterar_pokemon(self,nome:str,pokemonnovo:Pokemon):
         pokemonnovo.buscar_imagem()
         comando="UPDATE pokemon SET nome=?,numero_pokedex=?,tipo1=?,tipo2=?,hp=?,defesa=?,ataque=?,altura=?,peso=?,img=? WHERE nome=?"
